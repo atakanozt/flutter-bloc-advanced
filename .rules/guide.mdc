@@ -1,0 +1,520 @@
+---
+alwaysApply: true
+---
+
+# Developer Guide for Flutter-Based Mobile Applications
+
+## Setting up Flutter with FVM (Flutter Version Management)
+
+As with every technology, flutter framework and dart programming language has their own versioning. If you are not trying to benefit from something custom or need future dart features; you will not have to concern yourself with dart as it will be managed by flutter. However, we still need to manage flutter version.
+
+Flutter has versions but also channels. Available channels are:
+
+1. stable
+2. beta
+3. main
+
+newest features are first released under main and as it matures main -&gt; beta -&gt; stable.
+
+It is recommended to start your project using stable channel. However, as time goes on the actual version under stable channel changes. That is, as of Oct 17, 2025, stable channel has the version released on Oct 9, 2025 which is 3.35.6. After each stable release, this will change. You can think it similar to `latest` tag of docker images. When we start we need to use them but we cannot rely on them since they change. They are not pinned versions.
+
+As with docker images, we will start our project with stable channel and then look for actual version under it, which is 3.35.6 for now, and pin our project to that version. If we are to pin our project to stable channel; after 1 year, things may change and our project may not compile.
+
+[FVM](https://fvm.app) will be helping us from installing flutter to creating a project and maintaining it. While doing so, it will allow us to use different flutter versions for different projects on the same machine without any hassle.
+
+#### 1. Install FVM
+
+```bash
+brew tap leoafarias/fvm
+brew install fvm
+```
+
+**Note:** Homebrew is not only for macOS but also works for Linux. You can use homebrew on both macOS and Linux. If you want alternative installation options, check out [Installation](https://fvm.app/documentation/getting-started/installation).
+
+#### 2. About FVM Proxy
+
+FVM functions as a proxy. Normally, we would install flutter and then use `flutter` cli command to interact with flutter. However, this does not scale well. FVM will proxy our flutter commands to the version we want. From now on, if you search online and see some command where it calls
+
+```
+flutter <arg1> <arg2> ...
+```
+
+you know you need to proxy it to fvm by just prefixing it with `fvm`. That is
+
+```
+fvm flutter <arg1> <arg2> ...
+```
+
+You can test this by just calling `flutter` which will give you nothing if you didn't previously installed flutter. Now you can call `fvm flutter` which may install some things to make it work but it will give you an output.
+
+FVM has global and local context. That is, you can specifically tell fvm to use specific version of flutter on specific directories and use global version everywhere else. Let's tell it to use stable channel on global context by running the command below
+
+```
+fvm global stable
+```
+
+Now we can check what version of flutter we are actually using.
+
+```
+fvm flutter --version
+```
+
+It will give you an output in the format as below
+
+```
+Flutter 3.35.6 • channel stable • https://github.com/flutter/flutter.git
+Framework • revision 9f455d2486 (9 days ago) • 2025-10-08 14:55:31 -0500
+Engine • hash a5f2c36e367c13f868cfe98db5806f562c52c35e (revision d2913632a4) (9
+days ago) • 2025-10-07 17:26:21.000Z
+Tools • Dart 3.9.2 • DevTools 2.48.0
+```
+
+If it is different than mine, no worries. This is stable channel and it is expected to be. For our project we will make sure we are on the same version.
+
+#### 3. Creating a Flutter Project
+
+```
+fvm flutter create my_first_flutter_project
+```
+
+Running this will create a flutter project in my_first_flutter_project folder for you.
+
+Now open it in your IDE. For Cursor/VSCode, you should also install `dart-code.flutter` extension so that you IDE will know how to interact with Flutter.
+
+**Note:** For our projects, I will add extension recommendation (`extensions.json`) to our projects so that Cursor/VSCode will tell you to install required extensions when you open it.
+
+[![image.png](https://wiki.lidyagenomics.com/uploads/images/gallery/2025-10/scaled-1680-/rcgimage.png)](https://wiki.lidyagenomics.com/uploads/images/gallery/2025-10/rcgimage.png)
+
+#### 4. Pinning Flutter Version
+
+You've used stable channel and that specific flutter version to create your flutter project. However, it does not mean it have to be used by that specific version. Your project has some constraints on which flutter (and dart) versions can be used in this project but it does not know actual versions to be used by this project. That is, if I get the same project code, I will not know which flutter version to use and it is likely to crash as the time gap expands.
+
+Since we are on the latest version, we will pin it to use that version. That is, next developer will know what version they are supposed to run this project on. Inside project directory, we will call
+
+```
+fvm use <flutter_version>
+```
+
+For our case, we want to pin our project to the latest flutter version which is also what I used to create the project, `3.35.6`. It will create `.fvmrc` file and `.fvm` directory inside your project directory. `.fvm` must be added to `.gitignore` since it contains symbolic link to actual flutter version. If you are in a repo, it will ask you to add it to `.gitignore`. You should add `.fvmrc` to your repository so that next time you use fvm, fvm will know which version to use.
+
+Let's now say I cloned your repository. When I use any flutter command, it will use pinned version and if not installed, it will ask me if it should install.
+
+**Note:** In our mobile app repo, this will have been already done so you will directly use fvm.
+
+#### 5. Doctor
+
+Flutter has a nice cli command called `doctor` which will guide you on your flutter setup journey. That is, since flutter is a cross-platform development framework, you can use flutter to create programs for different platforms:
+
+- macos
+- linux
+- windows
+- ios
+- android
+- web
+- even more on advanced use
+
+`doctor` will tell you what you need for what platform. That is, for example, on macos you will need some dependencies to develop applications for macos or ios or android or web. It will tell you what platform dependencies are ready and therefore you can start building. We can always specify what platforms we want when creating our project but we can always remove later.
+
+[![image.png](https://wiki.lidyagenomics.com/uploads/images/gallery/2025-10/scaled-1680-/vXjimage.png)](https://wiki.lidyagenomics.com/uploads/images/gallery/2025-10/vXjimage.png)
+
+As you can see, we have all default platforms as their own folders. We will rarely touch those. Our actual code will live inside lib. Now, let's run doctor
+
+```
+fvm flutter doctor -v
+```
+
+We want this to look like this at the end
+
+[![image.png](https://wiki.lidyagenomics.com/uploads/images/gallery/2025-10/scaled-1680-/J73image.png)](https://wiki.lidyagenomics.com/uploads/images/gallery/2025-10/J73image.png)
+
+However, initially, you will need to install XCode(AppStore) and Android Studio(Web). It will guide you on what you need to do. You need to do things and periodically use doctor to check if there is anything else to do. For any issue you have, you can contact [Ahmet Can Ogreten](https://lidya-genomics.slack.com/archives/D0834A9CDB7).
+
+After setup, you will have this kind of development environment.
+
+[![image.png](https://wiki.lidyagenomics.com/uploads/images/gallery/2025-10/scaled-1680-/sehimage.png)](https://wiki.lidyagenomics.com/uploads/images/gallery/2025-10/sehimage.png)
+
+We will have a session where we perform these steps together as well, so don't worry if something goes wrong. As always, you can talk to [Ahmet Can Ogreten](https://lidya-genomics.slack.com/archives/D0834A9CDB7) about anything related to this guide.
+
+I suggest you read [Flutter's Official Docs](https://docs.flutter.dev/get-started/learn-flutter) for detailed and up-to-date knowledge. I will touch on a few important concepts only in this document.
+
+## State Management
+
+In any project, state management is one of the most important concepts. On server side, we design backends in a way that they are as stateless as possible. That is, state is retrieved from a datastore such as PostgreSQL as needed. This is because they need to serve to not only one user but many user and they need to do it efficiently.
+
+However, on frontend side, we have a single user and we would like to serve to that one specific user efficiently in terms of both performance but also UX.
+
+For example, would it be a good UX if a user needed to enter their credentials for everything they do? Obviously, no. Although users do this as login process once, the frontend code do this for every request on their behalf. To be able to do this, they need a some kind of state management.
+
+In Flutter, there are many ways that you can manage state. Some come directly with Flutter and some are provided as a package to simplify things on top of flutter. We will be using `setState` (comes with flutter) and `bloc` (a package developed by Felix Angelov) for different needs.
+
+#### setState
+
+In Flutter, we form UI by nesting widgets (it is what component is in React). Basically, widgets are classes with `build` functions. When platform builds UI (or refreshes it as per fps), it will call each widgets' build function and shows the output.
+
+[![image.png](https://wiki.lidyagenomics.com/uploads/images/gallery/2025-10/scaled-1680-/qBSimage.png)](https://wiki.lidyagenomics.com/uploads/images/gallery/2025-10/qBSimage.png)
+
+This is a simple widget and its output is as below
+
+[![image.png](https://wiki.lidyagenomics.com/uploads/images/gallery/2025-10/scaled-1680-/8OUimage.png)](https://wiki.lidyagenomics.com/uploads/images/gallery/2025-10/8OUimage.png)
+
+There are 2 major widget types we will use in our application. `StatelessWidget` and `StatefulWidget`. As with their name, we cannot hold state in `StatelessWidget`. More refined explanation would be we cannot hold dynamic state.
+
+[![image.png](https://wiki.lidyagenomics.com/uploads/images/gallery/2025-10/scaled-1680-/Rbdimage.png)](https://wiki.lidyagenomics.com/uploads/images/gallery/2025-10/Rbdimage.png)
+
+As you can see, if I try to create a non-final variable (that I can change the value of) it gives an error. By making it final, ensuring the compiler that we will not be changing it, fixes the issue. This is why I say it can hold state but not dynamic state.
+
+If we need state, as you guessed, we need `StatefulWidget`.
+
+As they can be verbose and error prone, there are some shortcuts that comes with the extensions we installed. Instead of typing your own `StatelessWidget` and `StatefulWidget`, writing `stless` and `stful` gives you options to create them.
+
+[![image.png](https://wiki.lidyagenomics.com/uploads/images/gallery/2025-10/scaled-1680-/v0rimage.png)](https://wiki.lidyagenomics.com/uploads/images/gallery/2025-10/v0rimage.png)
+
+[![image.png](https://wiki.lidyagenomics.com/uploads/images/gallery/2025-10/scaled-1680-/bMzimage.png)](https://wiki.lidyagenomics.com/uploads/images/gallery/2025-10/bMzimage.png)
+
+For example, selecting `Flutter Stateful Widget` will give you a nice template that already selected your widget name portions. You will create your widgets this way.
+
+[![Screen Recording 2025-10-17 at 14.30.54.gif](https://wiki.lidyagenomics.com/uploads/images/gallery/2025-10/72Sscreen-recording-2025-10-17-at-14-30-54.gif)](https://wiki.lidyagenomics.com/uploads/images/gallery/2025-10/72Sscreen-recording-2025-10-17-at-14-30-54.gif)
+
+For StatefulWidgets, you will be creating two classes. I will not deep dive on technical side but you can think them being the same class.
+
+Now, it does not give an error when I create a non-final variable. Even better, I can even dynamically change it.
+
+[![Screen Recording 2025-10-17 at 14.40.59.gif](https://wiki.lidyagenomics.com/uploads/images/gallery/2025-10/screen-recording-2025-10-17-at-14-40-59.gif)](https://wiki.lidyagenomics.com/uploads/images/gallery/2025-10/screen-recording-2025-10-17-at-14-40-59.gif)
+
+I need to wrap where I dynamically change a variable with `setState`. This is to let the framework that a variable is changed.
+
+For React gurus, you can think it as similar as `useState`.
+
+- Every variable you defined in State class is actually the first return value of `useState` : getter
+- and when you use `setState` you are actually running the 2nd return value from `useState` : setter.
+
+This is fine for small scale demo-like state management. However, as we get serious, it will not scale well. Just think auth state that we will be using everywhere on our application.
+
+1. Our app will not be a single widget. (Please no)
+2. There are ways you can use simple state management for widget-trees using another kind of widget `InheritedWidget` similar to `useContext` in React but it still does not scale well and there will be much boilerplate code you need to write.
+
+#### Bloc Architecture
+
+There is a specific use case where using setState is applicable which I will be talking about at the end. Anywhere else, we will use bloc.
+
+Before we get into bloc, I want touch upon a crucial concept of designing our application. That is, layers.
+
+[![image.png](https://wiki.lidyagenomics.com/uploads/images/gallery/2025-10/scaled-1680-/DClimage.png)](https://wiki.lidyagenomics.com/uploads/images/gallery/2025-10/DClimage.png)
+
+Bloc architecture is what we will follow (It is very similar to MVVM). Lower layers will provide service to upper layers. Layers will only know their lower-most layer and only by interface. Lower-most layer will be injected into upper-most layer by using dependency injection. We will talk about how we do this later. Right now, let's assume they know how to access the layer below and discuss their responsibilities.
+
+##### Presentation
+
+This layer is responsible only for UI elements. That is, they don't have their own logic apart from logic for UI elements. That is, the logic of expanding an accordion when clicked on a button is a UI logic and can be kept in Presentation layer. However, the click of a button to remove some item from a list is not. It should use Business Logic layer for such operations.
+
+`setState` is only valid for such cases, UI state. It may be temporary state of a `TextField` or animation state. Anywhere else, we won't use it.
+
+In our application, we will have a shared widget library for elements of our application that are designed and kept in a shared folder. Using these, we will form presentation layer (pages and widgets) of our features.
+
+##### Business Logic
+
+This logic is responsible only for app logic. It does not care how data is presented or action is collected and also does not care where the data goes and where it comes from. For example, for an ad serving application, how often the ad is displayed is the logic. Where it is displayed is not or where the ad is coming from is not.
+
+Example logic definitions can be
+
+1. show ads only to free users
+2. if ads already are showed a user, wait for 15 minutes of ad-free experience etc.
+
+##### Repository
+
+Finally, the simplest layer is repository layer. It just handles data. It may be an REST API Call, gRPC, or can just mock latency and return static data. For example, calling an API is the responsibility of Repository layer.
+
+We will keep our repositories in a shared folder since they are supposed to be used by many features.
+
+#### Bloc
+
+Now, let's discuss how we will use bloc (**B**usiness **Lo**gi**c**) for business logic. bloc is just another class.
+
+[![image.png](https://wiki.lidyagenomics.com/uploads/images/gallery/2025-10/scaled-1680-/stOimage.png)](https://wiki.lidyagenomics.com/uploads/images/gallery/2025-10/stOimage.png)
+
+There is a vscode extension called `felixangelov.bloc` that will help us create files faster as in the case of `StatefulWidget`. After installing it you can use command pallette to create a bloc as below.
+
+[![Screen Recording 2025-10-17 at 17.48.04.gif](https://wiki.lidyagenomics.com/uploads/images/gallery/2025-10/screen-recording-2025-10-17-at-17-48-04.gif)](https://wiki.lidyagenomics.com/uploads/images/gallery/2025-10/screen-recording-2025-10-17-at-17-48-04.gif)
+
+[![image.png](https://wiki.lidyagenomics.com/uploads/images/gallery/2025-10/scaled-1680-/UQKimage.png)](https://wiki.lidyagenomics.com/uploads/images/gallery/2025-10/UQKimage.png)
+
+`counter_bloc.dart` is the main file that contains the bloc, i.e. business logic. It is where we define what will happen on what events and what states will be published if any. That is, bloc is submitted events that it reacts by doing things and publish none, one, or many states.
+
+**Note:** Equatable is a package that makes object equality tests not by reference but data that object holds. I will be explaining what it helps with at the end of this section.
+
+As you guessed correctly, `counter_event.dart` is where we define available events while `counter_state.dart` is where we define available states.
+
+For a very simplistic example, let's implement a counter business logic where user can increment/decrement by a specified amount. For this, we don't need any UI knowledge. We are only designing the business logic.
+
+[![image.png](https://wiki.lidyagenomics.com/uploads/images/gallery/2025-10/scaled-1680-/Ngsimage.png)](https://wiki.lidyagenomics.com/uploads/images/gallery/2025-10/Ngsimage.png)
+
+As a diagram,
+
+[![image.png](https://wiki.lidyagenomics.com/uploads/images/gallery/2025-10/scaled-1680-/bVVimage.png)](https://wiki.lidyagenomics.com/uploads/images/gallery/2025-10/bVVimage.png)
+
+When `CounterBloc` first initializes, it publishes a state called `CounterInitial`. It does not have to, this is a design choice. You can for example just publish `Incremented(count:0)`. It really depends on what you want to achieve. For a simple counter logic, you don't even need to seperate `Incremented` and `Decremented` states but I would like to include more than one state to demonstrate and I will be differentiating them in presentation layer.
+
+Now, you have a bloc (a class) with state and events (which are also classes). What remains left is to create it somewhere and use it somewhere.
+
+As with declarative UI frameworks, you create your UI as a tree of widgets (we prefer widgets not components).
+
+For example,
+
+[![image.png](https://wiki.lidyagenomics.com/uploads/images/gallery/2025-10/scaled-1680-/hYFimage.png)](https://wiki.lidyagenomics.com/uploads/images/gallery/2025-10/hYFimage.png)
+
+this widget creates a widget tree as below.
+
+[![image.png](https://wiki.lidyagenomics.com/uploads/images/gallery/2025-10/scaled-1680-/kXPimage.png)](https://wiki.lidyagenomics.com/uploads/images/gallery/2025-10/kXPimage.png)
+
+With bloc, we need to provide our bloc to a portion of widget tree so that descendants can send events to our bloc and receive states from our bloc. To do this, we need to add a `BlocProvider` widget to where we want to provide.
+
+**Note:** There is a package called provider that uses Flutter's `InheritedWidget` to achieve what it does. Even though, we will not directly use it, provider uses `InheritedWidget` and many libraries use provider library. For more info, checkout [provider](https://pub.dev/packages/provider).
+
+If you installed flutter and bloc vscode extension you can use `cmd + .` context menu to easily nest widgets which may otherwise becomes meticulous task to do so.
+
+[![Screen Recording 2025-10-20 at 01.49.45.gif](https://wiki.lidyagenomics.com/uploads/images/gallery/2025-10/screen-recording-2025-10-20-at-01-49-45.gif)](https://wiki.lidyagenomics.com/uploads/images/gallery/2025-10/screen-recording-2025-10-20-at-01-49-45.gif)
+
+Now, I can access `CounterBloc` inside `MyStatefulWidget` because it is provided in upper layers.
+
+To use the state published by bloc, we will use `BlocBuilder`.
+
+[![image.png](https://wiki.lidyagenomics.com/uploads/images/gallery/2025-10/scaled-1680-/ipSimage.png)](https://wiki.lidyagenomics.com/uploads/images/gallery/2025-10/ipSimage.png)
+
+To send an event to the bloc, we need a reference to bloc. To get a reference to the bloc, we can use `context.read()` function which allows to get reference for provided object from descendants in the widget tree.
+
+[![Screen Recording 2025-10-20 at 02.04.47.gif](https://wiki.lidyagenomics.com/uploads/images/gallery/2025-10/screen-recording-2025-10-20-at-02-04-47.gif)](https://wiki.lidyagenomics.com/uploads/images/gallery/2025-10/screen-recording-2025-10-20-at-02-04-47.gif)
+
+This is state management. As you see, we started without even caring about UI. However, we kept actual data in the bloc object but it may as well come from a database/api/mock as well.
+
+In fact, let's now create a `CounterRepository` to demonstrate.
+
+[![image.png](https://wiki.lidyagenomics.com/uploads/images/gallery/2025-10/scaled-1680-/Hpmimage.png)](https://wiki.lidyagenomics.com/uploads/images/gallery/2025-10/Hpmimage.png)
+
+This is our `CounterRepository`. We created an interface and also mock version of this interface. In the future, we may use a Redis/Postgres/Backend any type of data store without changing anywhere but only repository layer.
+
+We defined our repository but we still need to create it somewhere and somehow give repository access to our bloc depending on our interface. This is where **Service Locater** comes in handy (although there are subtle differences, we may sometime call the concept as dependency injection as well. They differ in how it is done but they basically achieve the same thing.)
+
+##### Service Locator
+
+Flutter provides a way to access an object from descendants. However, sometimes this is not enough. That is, we may need to access some objects but we may not be in descendant widgets or even we may not be in the widget tree at all. In such cases, we register the object we want to make accessible. After that, we can use service locator object to access it anywhere in our app.
+
+[get_it](https://pub.dev/packages/get_it) is a package that provides this implementation.
+
+[![image.png](https://wiki.lidyagenomics.com/uploads/images/gallery/2025-10/scaled-1680-/wt3image.png)](https://wiki.lidyagenomics.com/uploads/images/gallery/2025-10/wt3image.png)
+
+We register our repositories before we start our application. We do not have to be. We can register anywhere in our app lifecycle but it is a good place for repositories to register. Also, notice that we use `ICounterRepository` as type and give object of `MockCounterRepository`. Later, we will use `ICounterRepository` type to ask the actual implementation without knowing the actual implementation. This is how we ensure decoupled layers.
+
+Now, in bloc, we can actually get registered repository and use it.
+
+[![image.png](https://wiki.lidyagenomics.com/uploads/images/gallery/2025-10/scaled-1680-/MJ0image.png)](https://wiki.lidyagenomics.com/uploads/images/gallery/2025-10/MJ0image.png)
+
+This is how we do it. In bloc, we get the actual implementation of the repository and instead of storing the count in bloc and modifying it, we use repository functions. Let's see our app.
+
+[![Screen Recording 2025-10-20 at 02.36.52.gif](https://wiki.lidyagenomics.com/uploads/images/gallery/2025-10/screen-recording-2025-10-20-at-02-36-52.gif)](https://wiki.lidyagenomics.com/uploads/images/gallery/2025-10/screen-recording-2025-10-20-at-02-36-52.gif)
+
+Using delays, we just mocked "over the network data". If we want to store the counter somewhere, what we need to do is
+
+1. Write another concerete implementation of `ICounterRepository` such as `FirebaseCounterRepository`
+2. Register `FirebaseCounterRepository` in `main.dart` instead of `MockCounterRepository`
+
+and everything will work as expected.
+
+One last thing is that, there is a simpler version of bloc called `cubit`. Instead of events being another types of classes, cubit makes them methods that we can call. This reduces the number of files and makes things simpler. There are some use cases that using bloc is better but we will not face such situations for 99% of the time. Therefore, always start with a cubit. Below is the cubit example `CounterCubit` of the `CounterBloc` we just created.
+
+[![image.png](https://wiki.lidyagenomics.com/uploads/images/gallery/2025-10/scaled-1680-/S64image.png)](https://wiki.lidyagenomics.com/uploads/images/gallery/2025-10/S64image.png)
+
+There will not be `counter_event.dart` anymore. `counter_state.dart` will be the same and this is how we create the cubit.
+
+While using it, instead of using add method of bloc and giving an instance of event object, we just call the method and that's it.
+
+[![image.png](https://wiki.lidyagenomics.com/uploads/images/gallery/2025-10/scaled-1680-/O8Uimage.png)](https://wiki.lidyagenomics.com/uploads/images/gallery/2025-10/O8Uimage.png)
+
+**Note:** By creating state objects that extend `Equatable`, bloc tries to optimize rendering. That is, it will try not to render if next state is the same as the previous state. The package provides many more helper functions such as `copyWith` which allows creating a copy of an object by changing only the values we want.
+
+## Layer-First vs Feature-First Folder Architecture
+
+In any real-world project, you are likely to have many features that collectively forms your product. However, the structure you lay on these features in your codebase is often overlooked. It may seem natural to put similar things together but before we do that, we need to define what similar is.
+
+For example, if we define similarity as being the same type of something; it is logical to put data classes or controller or repositories together, right?
+
+[![image.png](https://wiki.lidyagenomics.com/uploads/images/gallery/2025-10/scaled-1680-/aQ8image.png)](https://wiki.lidyagenomics.com/uploads/images/gallery/2025-10/aQ8image.png)
+
+It seems well-organised. However, as we add more features:
+
+[![image.png](https://wiki.lidyagenomics.com/uploads/images/gallery/2025-10/scaled-1680-/V8eimage.png)](https://wiki.lidyagenomics.com/uploads/images/gallery/2025-10/V8eimage.png)
+
+even though I just added 2 more features with minimal functionality, it already started to become complex. Imagine how it would be when we have 100 or 1000 features.
+
+This is called **layer-first folder architecture**. Although it seems logical initially, it will not scale well and it will be hard to maintain. No matter which project, which framework, if we aim to maintain it; we should always use **feature-first folder architecture**.
+
+What I just showed is not actually **layer-first folder architecture** but **layer folder architecture.** To make it layer-first architecture we need to divide them into their separate features folder after we divided them by layer as below.
+
+[![image.png](https://wiki.lidyagenomics.com/uploads/images/gallery/2025-10/scaled-1680-/eFjimage.png)](https://wiki.lidyagenomics.com/uploads/images/gallery/2025-10/eFjimage.png)
+
+However, as you can see, although it tries to make it more organised, it fails to do so and adds even more complexity.
+
+Let's list the problems with **layer-first folder architecture:**
+
+1. **Locality of change:** Adding a new feature requires touch on multiple places.
+2. **Scalability:** each feature feels small as we only see related files in our file browser.
+3. **Better ownership:** Teams or persons can have the full responsibility of a feature completely
+4. **Reduced coupling:** Internals stay internal, only public code is accessed everywhere else
+5. **Simplifies testing and CI/CD:** Since we will see changes in a specific feature folder, it will be easier to test, merge and run ci/cd even partially for only those folders with greater confidence.
+
+This list can be made longer by just deriving use-cases. Instead of **layer-first folder architecture**, we will use **feature-first folder architecture** as below.
+
+[![image.png](https://wiki.lidyagenomics.com/uploads/images/gallery/2025-10/scaled-1680-/xGYimage.png)](https://wiki.lidyagenomics.com/uploads/images/gallery/2025-10/xGYimage.png)
+
+Now, If I for example will work on edit_family feature, I will only see related files and my PR will be easier to review, test, merge.
+
+[![image.png](https://wiki.lidyagenomics.com/uploads/images/gallery/2025-10/scaled-1680-/XHJimage.png)](https://wiki.lidyagenomics.com/uploads/images/gallery/2025-10/XHJimage.png)
+
+## Routing
+
+Think about a stack of pages(just widgets), routing works just like that in its simpler form. This is perfectly fine for a simple application. You can put your new page on top of other pages to go to a different page and pop to return back. However, as you need more features such as [deep linking](https://codewithandrea.com/articles/flutter-deep-links/), this will not be enough.
+
+First of all, as in web, there is no url in Flutter applications. That is, it does not have to be. It is perfectly fine to define your different routes by pushing and popping different pages. However, think about some situations where
+
+1. You sent a notification and you want your user to be navigated to a specific page of your application. (Specific page should open 3 pages on top on another)
+2. You want to add a button/link that navigates your user to somewhere else in your application. (somewhere else may also need to add other pages below your final destination)
+3. You may add a guard to your page as in the case of authentication and redirect
+
+In such scenarios, we would need url parameter like structure for our pages.
+
+Different things have been tried in Flutter (you can check [Understanding Flutter Navigator 2.0](https://blog.codemagic.io/flutter-navigator2/)) as you can use the routing solution that came with flutter, there have been packages that makes our lives easier. The most mature and most active routing solution that people started to migrate to is [go_router](https://pub.dev/packages/go_router). We will be using it.
+
+**Note:** If you are planning to use Flutter with web as it is a cross-platform framework that can also be used for web, this is must if you want your url to change as you navigate through different pages.
+
+[![image.png](https://wiki.lidyagenomics.com/uploads/images/gallery/2025-10/scaled-1680-/5Wyimage.png)](https://wiki.lidyagenomics.com/uploads/images/gallery/2025-10/5Wyimage.png)
+
+`router.dart` and `main.dart` shows how we setup go_router package. As it is very easy to setup, there are some important design choices we make to make our application scalable and decoupled as much as possible.
+
+1. Every route must have a path but can have a name. However, we will enforce this and always include a name with a route. This name will be used inside our application when we want to navigate to that page. We will never use path directly since it is error-prone.
+2. While providing path and name, we will not directly write strings inside GoRouter object. Instead, we will create 2 abstract classes with static fields to define our paths and names. Everywhere else, we will use this static member variable. This allows us to change any route path and name without touching anywhere else.
+
+These conventions we follow will allow our routes to be type-safe.
+
+As you can see, we can also provide path parameter and query parameters to our routes. They will unwrap and send to our page widget as widget parameters. I highly recommend you check [Get Started](https://pub.dev/documentation/go_router/latest/topics/Get%20started-topic.html) page of go_router since there are different routes for different use cases such as Nested Routes and Shell Routes which are used for bottom navigation bar like features.
+
+When we want to navigate, we use helper function `context.goNamed` in our application as below.
+
+[![image.png](https://wiki.lidyagenomics.com/uploads/images/gallery/2025-10/scaled-1680-/m1Himage.png)](https://wiki.lidyagenomics.com/uploads/images/gallery/2025-10/m1Himage.png)
+
+## Assets Management
+
+Flutter has a docs on how to add assets in our application [Assets and Images](https://docs.flutter.dev/ui/assets/assets-and-images). Any file, image, video that we we want to access in our application that comes installed with the app is an asset. Therefore, we would be careful not to include a big file higher res image video than it needs to be and inefficient format since bigger app size decreases installs.
+
+If we add our logo to our application the way Flutter provides,
+
+[![image.png](https://wiki.lidyagenomics.com/uploads/images/gallery/2025-10/scaled-1680-/E9dimage.png)](https://wiki.lidyagenomics.com/uploads/images/gallery/2025-10/E9dimage.png)
+
+It works fine. However, it is not type-safe. That is, we give a wrong string, it will not know if it is wrong.
+
+[![image.png](https://wiki.lidyagenomics.com/uploads/images/gallery/2025-10/scaled-1680-/EToimage.png)](https://wiki.lidyagenomics.com/uploads/images/gallery/2025-10/EToimage.png)
+
+And you will get such an ugly UI.
+
+To fix this problem and have type-safe assets, we will use yet another package called [flutter_gen](https://pub.dev/packages/flutter_gen). After setting it up and running `build_runner`, we can safely use `Assets.logo.logo.image()` which will mimic our folder structure.
+
+[![image.png](https://wiki.lidyagenomics.com/uploads/images/gallery/2025-10/scaled-1680-/6a8image.png)](https://wiki.lidyagenomics.com/uploads/images/gallery/2025-10/6a8image.png)
+
+With it you also have the ability to modify your assets in a more defined way as well.
+
+[![image.png](https://wiki.lidyagenomics.com/uploads/images/gallery/2025-10/scaled-1680-/akbimage.png)](https://wiki.lidyagenomics.com/uploads/images/gallery/2025-10/akbimage.png)
+
+Most importantly, you cannot make a mistake because it will not build.
+
+[![image.png](https://wiki.lidyagenomics.com/uploads/images/gallery/2025-10/scaled-1680-/Gl7image.png)](https://wiki.lidyagenomics.com/uploads/images/gallery/2025-10/Gl7image.png)
+
+**Note:** You need to run build_runner to see newly added assets. A vscode task will be ready for you to use for our application so no worries.
+
+There is a special case for svg files. There is a package called flutter_svg that renders svg files. However, it does it in runtime which may cause stuttering in UI. To solve this, there is a package called [vector_graphics_compiler](https://pub.dev/packages/vector_graphics_compiler) which does this compilation at build time. I highly recommend you check out [Transform SVG assets at build time (Vector Graphics Compiler)](https://codewithandrea.com/tips/vector-graphics-compiler/).
+
+[![image.png](https://wiki.lidyagenomics.com/uploads/images/gallery/2025-10/scaled-1680-/Gtlimage.png)](https://wiki.lidyagenomics.com/uploads/images/gallery/2025-10/Gtlimage.png)
+
+This way, rendering svg does not create a performance problem.
+
+## Localization
+
+For an app, it is likely that you will have users all over the world that are all talking different languages. The most mature way of handling localization is via [easy_localization](https://pub.dev/packages/easy_localization) package in Flutter.
+
+Let's now add localization support for Go to Counter Page button for Turkish and English. After we performed
+
+- initialized in main file
+- created translations folder inside assets folder
+- added translations folder to assets `pubspec.yaml`
+
+[![image.png](https://wiki.lidyagenomics.com/uploads/images/gallery/2025-10/scaled-1680-/bIrimage.png)](https://wiki.lidyagenomics.com/uploads/images/gallery/2025-10/bIrimage.png)
+
+Now, we need to create actual labels that needs to be translated. As a convention, we will use snake case of english wording as a label and also prefix it by `lbl_`. This makes it easier to find labels inside our application by searching. Otherwise, there will be many match for example for `home`. However, if we make it `lbl_home`; it is explicit.
+
+[![Screen Recording 2025-10-21 at 04.17.00.gif](https://wiki.lidyagenomics.com/uploads/images/gallery/2025-10/screen-recording-2025-10-21-at-04-17-00.gif)](https://wiki.lidyagenomics.com/uploads/images/gallery/2025-10/screen-recording-2025-10-21-at-04-17-00.gif)
+
+This package also allows
+
+- nesting labels
+- having plural and gender versions of labels
+- args and namedArgs
+- changing and getting locale
+- ...
+
+etc.
+
+## Storage
+
+There are different storage implementation to hold data on device depending on the type of data you want to hold.
+
+If you would like to hold key-value pairs and security is not a concern, you could use [shared_preferences](https://pub.dev/packages/shared_preferences).
+
+If you have key-value pairs but they are secure such as auth key, api key, you have to use [flutter_secure_storage](https://pub.dev/packages/flutter_secure_storage).
+
+Other than these, if you want more features such as queries etc. there are options aiming different things such as some being secure and some being sql. You can research on flutter local database. Some are presented below.
+
+- sembast: NoSQL
+- hive_ce: fast key-value
+- sqflite: sqlite implementation
+- drift: reactive sqlite
+
+and there are many more.
+
+## Environment Variables
+
+As with any application, we will need some environment variables to be available inside our application. Sometimes, these env variables contains sensitive data. On contrary to backend development, we are not in control of where our application runs. That is, if we add our api key to our application, we are basically sending our api key to anyone around the world. This creates a security risk. To minimize this risk we should try as much as possible not to add any sensitive data into our application. Nevertheless, this may not be possible always. In those cases, we need to obfuscate our code and environment variables.
+
+There is a Flutter package called [envied](https://pub.dev/packages/envied) that allows us to manage our environment variables and also obfuscate them so that we do not leak any sensitive data to intrusive users. It will read our .env file and insert it into our application as obfuscated.
+
+## OpenAPI Generator
+
+For any backend we use, let's say it supports OpenAPI (Swagger).
+
+[![image.png](https://wiki.lidyagenomics.com/uploads/images/gallery/2025-10/scaled-1680-/4Cqimage.png)](https://wiki.lidyagenomics.com/uploads/images/gallery/2025-10/4Cqimage.png)
+
+This is a very simple backend with a single api that register a user with email and password. As you can see it has interactive docs active. Also, on [http://127.0.0.1:8000/api/openapi.json](http://127.0.0.1:8000/api/openapi.json), it has openapi specification of the backend.
+
+Normally, we would have to create client-side by using this docs. However, we do not have to. By using `openapi.json` file, we can actually generate the api requests and they will be type-safe.
+
+This is possible thanks to OpenAPI generators. After we have `openapi.json file`, we can generate client-side on almost every language by using openapi generator implementations. Follow [Getting Started](https://openapi-generator.tech/docs/installation) guide to setup your `openapi-generator`. I prefer homebrew and suggest you do the same.
+
+```bash
+openapi-generator generate -i  http://127.0.0.1:8000/api/openapi.json -g dart -o wellura_api --additional-properties=pubName=wellura_api
+```
+
+calling this in our app for example creates a folder called `wellura_api` which we can add it to our application by local package.
+
+Now, thanks to code generation, I can call my api without writing actual request codes. Everything is type safe inputs and outputs. `CreateUserInSchema` and `CreateUserOutSchema` are schemas that I created on backend and they are generated automatically from specification.
+
+[![image.png](https://wiki.lidyagenomics.com/uploads/images/gallery/2025-10/scaled-1680-/alkimage.png)](https://wiki.lidyagenomics.com/uploads/images/gallery/2025-10/alkimage.png)
+
+## Testing
+
+will be available soon
+
+unit - integration - widget
+
+## CI/CD
+
+will be available soon
+
+coverage
+
+fastlane

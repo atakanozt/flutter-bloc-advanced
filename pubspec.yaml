@@ -1,0 +1,83 @@
+name: flutter_bloc_advance
+description: "Flutter Bloc Advance Template"
+publish_to: 'none'
+version: 0.13.1+1
+
+environment:
+  sdk: ^3.8.1
+  flutter: '3.32.8'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  cupertino_icons: 1.0.8
+  flutter_localizations:
+    sdk: flutter
+  flutter_bloc: 8.1.6
+  http: 1.5.0
+  go_router: 16.1.0
+  adaptive_theme: 3.7.0
+  equatable: 2.0.7
+  auto_route: 10.1.0+1
+  get: 4.7.2
+  intl: 0.20.2
+  pdf: 3.11.3
+  printing: 5.14.2
+  dart_json_mapper: 2.2.16
+  expansion_tile_card: 3.0.0
+  device_preview: 1.3.1
+  getwidget: 6.0.0
+  flutter_form_builder: 10.1.0
+  form_builder_validators: 11.2.0
+  intl_utils: 2.8.11
+  http_certificate_pinning: 3.0.1
+  bloc_concurrency: 0.2.5
+  modbus_client_tcp: 1.2.3
+  custom_navigation_bar: 0.8.2
+  flutter_inappwebview: 6.1.5
+  animated_toggle_switch: 0.8.5
+  reflectable: 4.0.13
+  glob: 2.1.3
+  shared_preferences: 2.5.3
+  logger: 2.6.1
+  get_storage: 2.1.1
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: 4.0.0
+  integration_test:
+    sdk: flutter
+  build_runner: 2.4.15
+  test: 1.25.15
+  bloc_test: 9.1.7
+  mockito: ^5.4.5
+  analyzer: ^6.11.0
+
+flutter_secure_storage:
+  enabled: true
+  class_name: SecureStorage
+  main_locale: en
+
+flutter_intl:
+  enabled: true
+  template-arb-file: lib/l10n/intl_en.arb
+  output-localization-file: l10n.dart
+  output-class: S
+
+flutter:
+  uses-material-design: true
+  generate: true
+  
+  fonts:
+    - family: Poppins
+      fonts:
+        - asset: assets/fonts/Poppins-Regular.ttf
+        - asset: assets/fonts/Poppins-Medium.ttf
+          weight: 500
+        - asset: assets/fonts/Poppins-Bold.ttf
+          weight: 700
+  
+  assets:
+    - assets/mock/
+    - assets/images/
