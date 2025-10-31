@@ -26,6 +26,8 @@ void main() async {
 
   const defaultLanguage = "en";
   AppLocalStorage().setStorage(StorageType.sharedPreferences);
+  // Load persisted cache (jwt, roles, username, theme, language) for auto-login before router starts
+  await AppLocalStorageCached.loadCache();
   await AppLocalStorage().save(StorageKeys.language.name, defaultLanguage);
 
   AppRouter().setRouter(RouterType.goRouter);

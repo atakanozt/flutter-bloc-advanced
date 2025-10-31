@@ -4,15 +4,12 @@ import 'package:flutter_bloc_advance/configuration/constants.dart';
 import 'package:flutter_bloc_advance/configuration/local_storage.dart';
 import 'package:flutter_bloc_advance/data/repository/account_repository.dart';
 import 'package:flutter_bloc_advance/utils/app_constants.dart';
+import 'package:flutter_bloc_advance/data/repository/login_repository.dart';
+import 'package:flutter_bloc_advance/routes/app_routes_constants.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../common_blocs/account/account.dart';
-import '../../common_widgets/drawer/drawer_bloc/drawer_bloc.dart';
-import '../../common_widgets/drawer/drawer_widget.dart';
-import '../../common_widgets/top_actions_widget.dart';
-import '../../common_widgets/language_notifier.dart';
-import '../dashboard/dashboard_page.dart';
-import '../dashboard/bloc/dashboard_cubit.dart';
-import '../../../data/repository/dashboard_repository.dart';
+// Minimal home per plan: remove dashboard/drawer/top widgets
 
 class HomeScreen extends StatelessWidget {
   HomeScreen({super.key});
@@ -42,33 +39,55 @@ class HomeScreen extends StatelessWidget {
         builder: (context, state) {
           debugPrint("HomeScreen account bloc builder: ${state.status}");
           if (state.status == AccountStatus.success) {
-            return ValueListenableBuilder<String>(
-              valueListenable: LanguageNotifier.current,
-              builder: (context, lang, _) {
-                return Localizations.override(
-                  context: context,
-                  locale: Locale(lang),
-                  child: Scaffold(
-                    appBar: AppBar(title: const Text(AppConstants.appName), actions: const [TopActionsWidget()]),
-                    key: _scaffoldKey,
-                    body: BlocProvider(
-                      create: (context) => DashboardCubit(repository: DashboardMockRepository())..load(),
-                      child: const DashboardPage(),
+            return Scaffold(
+              appBar: AppBar(title: const Text(AppConstants.appName)),
+              key: _scaffoldKey,
+              body: Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      'Welcome to Lidya '
+                              '${(AppLocalStorageCached.firstName ?? '')} '
+                              '${(AppLocalStorageCached.lastName ?? '')}'
+                          .trim(),
+                      style: Theme.of(context).textTheme.titleLarge,
+                      textAlign: TextAlign.center,
                     ),
-                    drawer: _buildDrawer(context),
-                  ),
-                );
-              },
+                    const SizedBox(height: 8),
+                    Text(AppLocalStorageCached.username ?? state.data?.email ?? '', textAlign: TextAlign.center),
+                    const SizedBox(height: 24),
+                    FilledButton(
+                      onPressed: () async {
+                        // Clear storage and logout
+                        final loginRepo = LoginRepository();
+                        await loginRepo.logout();
+                        if (context.mounted) {
+                          context.go(ApplicationRoutesConstants.login);
+                        }
+                      },
+                      child: const Text('Logout'),
+                    ),
+                  ],
+                ),
+              ),
             );
           }
 
           if (state.status == AccountStatus.loading) {
             return const Scaffold(body: Center(child: CircularProgressIndicator()));
           }
-          // else {
+          if (state.status == AccountStatus.failure) {
+            // When account load fails (e.g., missing/expired token), send user to login
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              if (context.mounted) {
+                context.go(ApplicationRoutesConstants.login);
+              }
+            });
+            return const Scaffold(body: SizedBox.shrink());
+          }
           debugPrint("Unexpected state : ${state.toString()}");
-          //return Scaffold(body: Center(child: Text("Home Screen Unexpected state : ${state.props}   ${state.toString()}")));
-          return Container();
+          return const Scaffold(body: SizedBox.shrink());
           // }
         },
       ),
@@ -114,15 +133,5 @@ class HomeScreen extends StatelessWidget {
     }
   }
 
-  Widget _buildDrawer(BuildContext context) {
-    debugPrint("HomeScreen _buildDrawer : init-theme ${AppLocalStorageCached.theme}");
-    // Reuse existing DrawerBloc from app-level provider to avoid multiple instances
-    final drawerBloc = context.read<DrawerBloc>();
-    // Ensure menus are loaded once if empty
-    if (drawerBloc.state.menus.isEmpty) {
-      final initialLanguage = AppLocalStorageCached.language ?? 'en';
-      drawerBloc.add(LoadMenus(language: initialLanguage));
-    }
-    return const ApplicationDrawer();
-  }
+  // Drawer removed for minimal template
 }

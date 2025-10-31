@@ -57,6 +57,12 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
         final user = await _accountRepository.getAccount();
         await AppLocalStorage().save(StorageKeys.roles.name, user.authorities);
         _log.debug("onSubmit save storage roles: {}", [user.authorities]);
+        if (user.firstName != null && user.firstName!.isNotEmpty) {
+          await AppLocalStorage().save(StorageKeys.firstName.name, user.firstName!);
+        }
+        if (user.lastName != null && user.lastName!.isNotEmpty) {
+          await AppLocalStorage().save(StorageKeys.lastName.name, user.lastName!);
+        }
 
         emit(LoginLoadedState(username: event.username, password: event.password));
 
@@ -99,6 +105,12 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
 
         final user = await _accountRepository.getAccount();
         await AppLocalStorage().save(StorageKeys.roles.name, user.authorities);
+        if (user.firstName != null && user.firstName!.isNotEmpty) {
+          await AppLocalStorage().save(StorageKeys.firstName.name, user.firstName!);
+        }
+        if (user.lastName != null && user.lastName!.isNotEmpty) {
+          await AppLocalStorage().save(StorageKeys.lastName.name, user.lastName!);
+        }
 
         emit(LoginLoadedState(username: event.email, password: event.otpCode));
       } else {

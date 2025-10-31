@@ -4,13 +4,9 @@ import 'package:flutter_bloc_advance/presentation/common_widgets/web_back_button
 import 'package:flutter_bloc_advance/routes/go_router_routes/app_go_router_config.dart';
 
 import '../data/repository/account_repository.dart';
-import '../data/repository/authority_repository.dart';
 import '../data/repository/login_repository.dart';
-import '../data/repository/menu_repository.dart';
 import '../presentation/common_blocs/account/account.dart';
-import '../presentation/common_blocs/authority/authority_bloc.dart';
 import '../presentation/common_blocs/theme/theme_bloc.dart';
-import '../presentation/common_widgets/drawer/drawer_bloc/drawer_bloc.dart';
 import '../presentation/screen/login/bloc/login.dart';
 import '../presentation/design_system/theme/app_theme.dart';
 
@@ -39,12 +35,8 @@ class App extends StatelessWidget {
     return MultiBlocProvider(
       providers: [
         BlocProvider<LoginBloc>(create: (_) => LoginBloc(repository: LoginRepository())),
-        BlocProvider<AuthorityBloc>(create: (_) => AuthorityBloc(repository: AuthorityRepository())),
         BlocProvider<AccountBloc>(create: (_) => AccountBloc(repository: AccountRepository())),
         BlocProvider<ThemeBloc>(create: (_) => ThemeBloc()..add(const LoadTheme())),
-        BlocProvider<DrawerBloc>(
-          create: (_) => DrawerBloc(loginRepository: LoginRepository(), menuRepository: MenuRepository()),
-        ),
       ],
       child: _buildAdaptiveThemeWrapper(),
     );

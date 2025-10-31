@@ -8,11 +8,8 @@ import 'package:flutter_bloc_advance/configuration/environment.dart';
 import 'package:flutter_bloc_advance/generated/l10n.dart';
 import 'package:flutter_bloc_advance/presentation/common_blocs/account/account.dart';
 import 'package:flutter_bloc_advance/routes/app_routes_constants.dart';
-import 'package:flutter_bloc_advance/routes/go_router_routes/routes/account_routes.dart';
 import 'package:flutter_bloc_advance/routes/go_router_routes/routes/auth_routes.dart';
 import 'package:flutter_bloc_advance/routes/go_router_routes/routes/home_routes.dart';
-import 'package:flutter_bloc_advance/routes/go_router_routes/routes/settings_routes.dart';
-import 'package:flutter_bloc_advance/routes/go_router_routes/routes/user_routes.dart';
 import 'package:flutter_bloc_advance/utils/security_utils.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:go_router/go_router.dart';
@@ -47,10 +44,7 @@ class AppGoRouterConfig {
     errorBuilder: (context, state) => ErrorScreen(state.error),
     routes: [
       ...HomeRoutes.routes,
-      ...AccountRoutes.routes,
-      ...UserRoutes.routes,
       ...AuthRoutes.routes,
-      ...SettingsRoutes.routes,
     ],
     redirect: (context, state) async {
       _log.debug("BEGIN: redirect");

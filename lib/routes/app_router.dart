@@ -2,13 +2,11 @@
 // This file contains the implementation of the app_router for the application.
 // It uses navigator, go_router and auto_route to navigate between screens.
 
-import 'package:auto_route/auto_route.dart' as auto_route;
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc_advance/configuration/app_logger.dart';
-import 'package:get/get.dart' as get_router;
 import 'package:go_router/go_router.dart' as go_router;
 
-enum RouterType { navigator, goRouter, autoRoute, getRouter }
+enum RouterType { navigator, goRouter }
 
 /// Application Navigator base class for navigation
 ///
@@ -166,123 +164,6 @@ class GoRouterStrategy implements RouterStrategy {
 /// AutoRoute implementation of RouteStrategy
 /// @link [AutoRoute](https://pub.dev/packages/auto_route)
 /// Not Tested!!!
-class AutoRouteStrategy implements RouterStrategy {
-  @override
-  Future<void> pop(BuildContext context) async {
-    auto_route.AutoRouter.of(context).pop();
-    // auto_route.AutoRouter.of(context).maybePop();
-    // auto_route.AutoRouter.of(context).back();
-  }
-
-  @override
-  Future<void> push(
-    BuildContext context,
-    String routeName, {
-    Object? args,
-    Map<String, dynamic> kwargs = const {},
-  }) async {
-    if (args != null && kwargs.isNotEmpty) {
-      Navigator.of(context).pushNamed(routeName, arguments: args);
-    } else if (args != null) {
-      Navigator.of(context).pushNamed(routeName, arguments: args);
-    } else {
-      Navigator.of(context).pushNamed(routeName);
-    }
-  }
-
-  @override
-  Future<void> pushRemoveUntil(
-    BuildContext context,
-    String routeName, {
-    Object? args,
-    Map<String, dynamic> kwargs = const {},
-  }) async {
-    if (args != null && kwargs.isNotEmpty) {
-      Navigator.of(context).pushNamedAndRemoveUntil(routeName, (route) => false, arguments: args);
-    } else if (args != null) {
-      Navigator.of(context).pushNamedAndRemoveUntil(routeName, (route) => false, arguments: args);
-    } else {
-      Navigator.of(context).pushNamedAndRemoveUntil(routeName, (route) => false);
-    }
-  }
-
-  @override
-  Future<void> pushReplacement(
-    BuildContext context,
-    String routeName, {
-    Object? args,
-    Map<String, dynamic> kwargs = const {},
-  }) async {
-    if (args != null && kwargs.isNotEmpty) {
-      Navigator.of(context).pushReplacementNamed(routeName, arguments: args);
-    } else if (args != null) {
-      Navigator.of(context).pushReplacementNamed(routeName, arguments: args);
-    } else {
-      Navigator.of(context).pushReplacementNamed(routeName);
-    }
-  }
-}
-
-/// Get route strategy implementation of RouteStrategy
-/// @link [RouteStrategy](https://pub.dev/packages/get)
-/// Not Tested!!!
-class GetRouteStrategy implements RouterStrategy {
-  @override
-  Future<void> pop(BuildContext context) async {
-    get_router.Get.back();
-  }
-
-  @override
-  Future<void> push(
-    BuildContext context,
-    String routeName, {
-    Object? args,
-    Map<String, dynamic> kwargs = const {},
-  }) async {
-    final queryParams = kwargs as Map<String, String>;
-    if (args != null && kwargs.isNotEmpty) {
-      get_router.Get.toNamed(routeName, arguments: args, parameters: queryParams);
-    } else if (args != null) {
-      get_router.Get.toNamed(routeName, parameters: queryParams);
-    } else {
-      get_router.Get.toNamed(routeName);
-    }
-  }
-
-  @override
-  Future<void> pushRemoveUntil(
-    BuildContext context,
-    String routeName, {
-    Object? args,
-    Map<String, dynamic> kwargs = const {},
-  }) async {
-    final queryParams = kwargs as Map<String, String>;
-    if (args != null && kwargs.isNotEmpty) {
-      get_router.Get.offNamedUntil(routeName, (route) => false, arguments: args, parameters: queryParams);
-    } else if (args != null) {
-      get_router.Get.offNamedUntil(routeName, (route) => false, parameters: queryParams);
-    } else {
-      get_router.Get.offNamedUntil(routeName, (route) => false);
-    }
-  }
-
-  @override
-  Future<void> pushReplacement(
-    BuildContext context,
-    String routeName, {
-    Object? args,
-    Map<String, dynamic> kwargs = const {},
-  }) async {
-    final queryParams = kwargs as Map<String, String>;
-    if (args != null && kwargs.isNotEmpty) {
-      get_router.Get.offNamed(routeName, arguments: args, parameters: queryParams);
-    } else if (args != null) {
-      get_router.Get.offNamed(routeName, parameters: queryParams);
-    } else {
-      get_router.Get.offNamed(routeName);
-    }
-  }
-}
 
 /// Application Navigator class for navigation
 ///
@@ -318,12 +199,6 @@ class AppRouter {
         break;
       case RouterType.goRouter:
         _routeStrategy = GoRouterStrategy();
-        break;
-      case RouterType.autoRoute:
-        _routeStrategy = AutoRouteStrategy();
-        break;
-      case RouterType.getRouter:
-        _routeStrategy = GetRouteStrategy();
         break;
     }
   }

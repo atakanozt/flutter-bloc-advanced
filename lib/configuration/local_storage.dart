@@ -24,17 +24,31 @@ class AppLocalStorageCached {
   static late List<String>? roles;
   static late String? language;
   static late String? username;
+  static late String? firstName;
+  static late String? lastName;
   static late String? theme;
   static late String? brightness;
 
   static Future<void> loadCache() async {
     _log.trace("Loading cache");
-    jwtToken = await AppLocalStorage().read(StorageKeys.jwtToken.name);
-    roles = await AppLocalStorage().read(StorageKeys.roles.name);
-    language = await AppLocalStorage().read(StorageKeys.language.name) ?? "en";
-    username = await AppLocalStorage().read(StorageKeys.username.name);
-    theme = await AppLocalStorage().read(StorageKeys.theme.name) ?? "classic";
-    brightness = await AppLocalStorage().read(StorageKeys.brightness.name) ?? "light";
+    jwtToken = await AppLocalStorage().read(StorageKeys.jwtToken.name) as String?;
+    final dynamic rolesRaw = await AppLocalStorage().read(StorageKeys.roles.name);
+    if (rolesRaw is List<String>) {
+      roles = rolesRaw;
+    } else if (rolesRaw is List) {
+      roles = rolesRaw.whereType<String>().toList();
+    } else {
+      roles = null;
+    }
+    final dynamic langRaw = await AppLocalStorage().read(StorageKeys.language.name);
+    language = (langRaw is String && langRaw.isNotEmpty) ? langRaw : "en";
+    username = await AppLocalStorage().read(StorageKeys.username.name) as String?;
+    firstName = await AppLocalStorage().read(StorageKeys.firstName.name) as String?;
+    lastName = await AppLocalStorage().read(StorageKeys.lastName.name) as String?;
+    final dynamic themeRaw = await AppLocalStorage().read(StorageKeys.theme.name);
+    theme = (themeRaw is String && themeRaw.isNotEmpty) ? themeRaw : "classic";
+    final dynamic brightnessRaw = await AppLocalStorage().read(StorageKeys.brightness.name);
+    brightness = (brightnessRaw is String && brightnessRaw.isNotEmpty) ? brightnessRaw : "light";
     _log.trace("Loaded cache with username:{}, roles:{}, language:{}, jwtToken:{}, theme:{}, brightness:{}", [
       username,
       roles,
@@ -47,7 +61,7 @@ class AppLocalStorageCached {
 }
 
 /// LocalStorage predefined keys
-enum StorageKeys { jwtToken, roles, language, username, theme, brightness }
+enum StorageKeys { jwtToken, roles, language, username, firstName, lastName, theme, brightness }
 
 /// Application Local Storage
 ///
