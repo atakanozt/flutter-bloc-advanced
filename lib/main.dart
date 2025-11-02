@@ -5,25 +5,26 @@ import 'package:flutter_bloc_advance/configuration/environment.dart';
 import 'package:flutter_bloc_advance/configuration/local_storage.dart';
 import 'package:flutter_bloc_advance/routes/app_router.dart';
 
-import 'app.dart';
-import 'main_prod.mapper.g.dart' show initializeJsonMapper;
+import 'main/app.dart';
+import 'main/main_local.mapper.g.dart' show initializeJsonMapper;
 
 /// IMPORTANT!! run this command to generate main_prod.mapper.g.dart
 // dart run build_runner build --delete-conflicting-outputs
 // flutter pub run intl_utils:generate
-/// main entry point of PRODUCTION
+/// main entry point of local computer development
 void main() async {
   // first configure the logger
   AppLogger.configure(isProduction: false);
-  final log = AppLogger.getLogger("main_prod.dart");
+  final log = AppLogger.getLogger("main_local.dart");
 
-  ProfileConstants.setEnvironment(Environment.prod);
+  ProfileConstants.setEnvironment(Environment.dev);
 
-  log.info("Starting App with env: {}", [Environment.prod.name]);
+  log.info("Starting App with env: {}", [Environment.dev.name]);
 
   initializeJsonMapper();
   WidgetsFlutterBinding.ensureInitialized();
 
+  //TODO change to the system language(browser language)
   const defaultLanguage = "en";
   AppLocalStorage().setStorage(StorageType.sharedPreferences);
   // Load persisted cache (jwt, roles, username, theme, language) for auto-login before router starts
@@ -38,7 +39,7 @@ void main() async {
   });
 
   //TODO change to the system theme(browser theme)
-  const defaultThemeName = "dark";
+  const defaultThemeName = "system";
   await AppLocalStorage().save(StorageKeys.theme.name, defaultThemeName);
 
   log.info("Started App with local environment language: {} and theme: {}", [defaultLanguage, defaultThemeName]);
